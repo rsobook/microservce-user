@@ -37,7 +37,7 @@ repositories {
 
 dependencies {
 
-    compile group: 'si.fri.rsobook', name: 'core', version: '1.0'
+    compile group: 'si.fri.rsobook', name: 'rsobook-core', version: '1.0'
 
     compile group: "com.kumuluz.ee", name: 'kumuluzee-core', version: '2.4.1'
     compile group: "com.kumuluz.ee", name: 'kumuluzee-cdi-weld', version: '2.4.1'

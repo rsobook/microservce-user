@@ -9,4 +9,3 @@ if [[ -z "${JAR}" ]];
         echo 'Starting KumuluzEE .. \n'
         java -jar ${JAR}
 fi
-
