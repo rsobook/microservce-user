@@ -10,23 +10,23 @@ then
     ######################################
     ### SET DB_HOST_ADDRESS
     ######################################
-    if [ -z "${DB_PORT_5432_TCP_ADDR}" ];
+    if [ -z "${DB_HOST}" ];
     then
-        printf "Env db address (DB_PORT_5432_TCP_ADDR) is not set."
+        printf "Env db address (DB_HOST) is not set."
         sed -i "s/DB_HOST_ADDRESS/localhost/g" config.yaml
     else
-        sed -i "s/DB_HOST_ADDRESS/${DB_PORT_5432_TCP_ADDR}/g" config.yaml
+        sed -i "s/DB_HOST_ADDRESS/${DB_HOST}/g" config.yaml
     fi
 
     ######################################
     ### SET DB_PORT
     ######################################
-    if [ -z "${DB_PORT_5432_TCP_PORT}" ];
+    if [ -z "${DB_PORT}" ];
     then
-        printf "Env db address (DB_PORT_5432_TCP_ADDR) is not set."
+        printf "Env db address (DB_PORT) is not set."
         sed -i "s/DB_HOST_PORT/5432/g" config.yaml
     else
-        sed -i "s/DB_HOST_PORT/${DB_PORT_5432_TCP_PORT}/g" config.yaml
+        sed -i "s/DB_HOST_PORT/${DB_PORT}/g" config.yaml
     fi
 
     ######################################
@@ -34,7 +34,7 @@ then
     ######################################
     if [ -z "${DB_NAME}" ];
     then
-        printf "Env db address (DB_PORT_5432_TCP_ADDR) is not set."
+        printf "Env db address (DB_NAME) is not set."
     else
         sed -i "s/DB_NAME/${DB_NAME}/g" config.yaml
     fi
@@ -42,23 +42,23 @@ then
     ######################################
     ### SET DB_USERNAME
     ######################################
-    if [ -z "${DB_ENV_POSTGRES_USER}" ];
+    if [ -z "${DB_USERNAME}" ];
     then
-        printf "Env db username (DB_ENV_POSTGRES_USER) is not set. Using 'postgres'."
+        printf "Env db username (DB_USERNAME) is not set. Using 'postgres'."
         sed -i "s/DB_USERNAME/postgres/g" config.yaml
     else
-        sed -i "s/DB_USERNAME/${DB_ENV_POSTGRES_USER}/g" config.yaml
+        sed -i "s/DB_USERNAME/${DB_USERNAME}/g" config.yaml
     fi
 
     ######################################
     ### SET DB_PASSWORD
     ######################################
-    if [ -z "${DB_ENV_POSTGRES_PASSWORD}" ];
+    if [ -z "${DB_PASSWORD}" ];
     then
-        printf "Env db password DB_ENV_POSTGRES_PASSWORD is not set. Using 'root'."
+        printf "Env db password DB_PASSWORD is not set. Using 'root'."
         sed -i "s/DB_PASSWORD/root/g" config.yaml
     else
-        sed -i "s/DB_PASSWORD/${DB_ENV_POSTGRES_PASSWORD}/g" config.yaml
+        sed -i "s/DB_PASSWORD/${DB_PASSWORD}/g" config.yaml
     fi
 
     ######################################

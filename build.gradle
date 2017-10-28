@@ -18,8 +18,13 @@ apply plugin: 'com.bmuschko.docker-remote-api'
 sourceCompatibility = 1.8
 
 ext {
+    dockerHubUser =  project.hasProperty('DOCKER_HUB_USER') ? DOCKER_HUB_USER : System.getenv('DOCKER_HUB_USER')
+    dockerHubEmail =  project.hasProperty('DOCKER_HUB_EMAIL') ? DOCKER_HUB_EMAIL : System.getenv('DOCKER_HUB_EMAIL')
+    dockerHubPassword =  project.hasProperty('DOCKER_HUB_PASSWORD') ? DOCKER_HUB_PASSWORD : System.getenv('DOCKER_HUB_PASSWORD')
+
     port = "5001"
-    dockerImageName = String.format("%s/%s", DOCKER_HUB_USER, project.name)
+    dockerHostname = "user.rsobook.fri.si"
+    dockerImageName = String.format("%s/%s", dockerHubUser, project.name)
     dockerImageTag = String.format("%s:%s", dockerImageName, version)
     dockerContainerName = String.format("%s", project.name)
 }
@@ -97,9 +102,9 @@ import com.bmuschko.gradle.docker.tasks.image.*
 docker {
     registryCredentials {
         url = 'https://hub.docker.com/'
-        email = DOCKER_HUB_EMAIL
-        password = DOCKER_HUB_PASSWORD
-        username = DOCKER_HUB_USER
+        email = dockerHubEmail
+        password = dockerHubPassword
+        username = dockerHubUser
     }
 }
 
@@ -111,6 +116,10 @@ task dockerfileCreate(type: Dockerfile) {
     environmentVariable("PORT", port)
     environmentVariable("JAR", buildKumuluzEE.archiveName)
     environmentVariable("DB_NAME", 'rsobook-user')
+    environmentVariable("DB_HOST", 'rsobook-microservice-database')
+    environmentVariable("DB_PORT", '5432')
+    environmentVariable("DB_USERNAME", 'postgres')
+    environmentVariable("DB_PASSWORD", 'root')
     exposePort {
         String.format("1%s:%s", port, port)
     }
@@ -122,24 +131,50 @@ task dockerfileCreate(type: Dockerfile) {
 
 task dockerfileCopyScript(type: Copy){
     group 'docker'
-    from "/build-dependency/run.sh"
-    from "/build-dependency/config.yaml"
+    from project.projectDir.path + "/build-dependency/run.sh"
+    from project.projectDir.path + "/build-dependency/config.yaml"
     into dockerfileCreate.destFile.parentFile
+}
+
+task containerStop(type: DockerStopContainer) {
+    group 'docker'
+    targetContainerId {
+        dockerContainerName
+    }
+    onError {
+        error -> println error.toString()
+    }
+}
+
+task containerRemove(type: DockerRemoveContainer) {
+    group 'docker'
+    dependsOn containerStop
+    targetContainerId {
+        dockerContainerName
+    }
+    onError {
+        error -> println error.toString()
+    }
+}
+
+task imageRemove(type: DockerRemoveImage) {
+    group 'docker'
+    dependsOn containerRemove
+    imageId dockerImageTag
+    onError {
+        error -> println error.toString()
+    }
 }
 
 task imageBuild(type: DockerBuildImage) {
     group 'docker'
+    dependsOn imageRemove
     dependsOn dockerfileCreate
     dependsOn dockerfileCopyScript
     dependsOn buildKumuluzEE
     inputDir = dockerfileCreate.destFile.parentFile
     tag = dockerImageTag
     //noCache = true
-}
-
-task imageRemove(type: DockerRemoveImage) {
-    group 'docker'
-    imageId dockerImageTag
 }
 
 task imagePushToDockerHub(type: DockerPushImage){
@@ -150,11 +185,14 @@ task imagePushToDockerHub(type: DockerPushImage){
 
 task containerCreate(type: DockerCreateContainer) {
     group 'docker'
+    dependsOn imageBuild
     targetImageId {
         dockerImageTag
     }
     containerName = dockerContainerName
     portBindings = [String.format("%s:%s", port, port)]
+    hostName = dockerHostname
+    network = 'rsonetwork'
 }
 
 task containerStart(type: DockerStartContainer) {
@@ -164,16 +202,9 @@ task containerStart(type: DockerStartContainer) {
     }
 }
 
-task containerStop(type: DockerStopContainer) {
+task dockerBootstrap() {
     group 'docker'
-    targetContainerId {
-        dockerContainerName
-    }
-}
-
-task containerRemove(type: DockerRemoveContainer) {
-    group 'docker'
-    targetContainerId {
-        dockerContainerName
-    }
+    dependsOn containerCreate
+    dependsOn containerStart
+    containerCreate.finalizedBy containerStart
 }
