@@ -116,7 +116,7 @@ task dockerfileCreate(type: Dockerfile) {
     environmentVariable("PORT", port)
     environmentVariable("JAR", buildKumuluzEE.archiveName)
     environmentVariable("DB_NAME", 'rsobook-user')
-    environmentVariable("DB_HOST", 'rsobook-microservice-database')
+    environmentVariable("DB_HOST", 'microservice-database')
     environmentVariable("DB_PORT", '5432')
     environmentVariable("DB_USERNAME", 'postgres')
     environmentVariable("DB_PASSWORD", 'root')
