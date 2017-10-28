@@ -32,11 +32,7 @@ ext {
 repositories {
     mavenCentral()
     maven {
-        url 'https://box.kisek.si/nexus/repository/maven-releases' //'http://localhost:8081/repository/maven-releases/'
-        credentials {
-            username NEXUS_USERNAME
-            password NEXUS_PASSWORD
-        }
+        url 'https://box.kisek.si/nexus/repository/maven-releases'
     }
 }
 
@@ -121,7 +117,7 @@ task dockerfileCreate(type: Dockerfile) {
     environmentVariable("DB_USERNAME", 'postgres')
     environmentVariable("DB_PASSWORD", 'root')
     exposePort {
-        String.format("1%s:%s", port, port)
+        String.format("%s:%s", port, port)
     }
     addFile(buildKumuluzEE.archiveName, "/usr/local/bin/kumuluzee/")
     addFile("config.yaml", "/usr/local/bin/kumuluzee")
