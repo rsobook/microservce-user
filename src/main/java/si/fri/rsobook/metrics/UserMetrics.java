@@ -16,4 +16,8 @@ public class UserMetrics {
         //usersReturned.inc(count);
     }
 
+    public boolean isHealthy(){
+        return true;
+    }
+
 }

@@ -1,12 +1,12 @@
 kumuluzee:
-  name: microservice-user
+  name: ms.user
   env:
     name: dev
   version: 1.0.0
   server:
-      base-url: http://localhost:8080
+      base-url:
       http:
-        port: 8080
+        port:
   datasources:
     - jndi-name: jdbc/RsobookDS
       connection-url: jdbc:postgresql://localhost:55432/rsobook-user
@@ -29,7 +29,7 @@ kumuluzee:
       mapping: /health
       enabled: true
     logs:
-      enabled: true
+      enabled: false
       level: INFO
       period-s: 30
     checks:
@@ -58,6 +58,7 @@ kumuluzee:
     #prometheus:
       #mapping: /prometheus
     logs:
+      enabled: false
       period-s: 30
       level: INFO
     web-instrumentation:
