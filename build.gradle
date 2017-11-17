@@ -34,18 +34,33 @@ repositories {
     maven {
         url 'https://box.kisek.si/nexus/repository/maven-releases'
     }
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
 }
 
 dependencies {
 
     compile group: 'si.fri.rsobook', name: 'rsobook-core', version: '1.1'
 
-    compile group: "com.kumuluz.ee", name: 'kumuluzee-core', version: '2.4.1'
-    compile group: "com.kumuluz.ee", name: 'kumuluzee-cdi-weld', version: '2.4.1'
-    compile group: "com.kumuluz.ee", name: 'kumuluzee-servlet-jetty', version: '2.4.1'
-    compile group: "com.kumuluz.ee", name: 'kumuluzee-jax-rs-jersey', version: '2.4.1'
-    compile group: "com.kumuluz.ee", name: 'kumuluzee-jpa-hibernate', version: '2.4.1'
-    compile group: "com.kumuluz.ee", name: 'kumuluzee-jta-narayana', version: '2.4.1'
+    compile group: "com.kumuluz.ee", name: 'kumuluzee-core', version: '2.5.0-SNAPSHOT'
+    compile group: "com.kumuluz.ee", name: 'kumuluzee-cdi-weld', version: '2.5.0-SNAPSHOT'
+    compile group: "com.kumuluz.ee", name: 'kumuluzee-servlet-jetty', version: '2.5.0-SNAPSHOT'
+    compile group: "com.kumuluz.ee", name: 'kumuluzee-jax-rs-jersey', version: '2.5.0-SNAPSHOT'
+    compile group: "com.kumuluz.ee", name: 'kumuluzee-jpa-hibernate', version: '2.5.0-SNAPSHOT'
+    compile group: "com.kumuluz.ee", name: 'kumuluzee-jta-narayana', version: '2.5.0-SNAPSHOT'
+
+    compile group: "com.kumuluz.ee.config", name: "kumuluzee-config-etcd", version: '1.1.0-SNAPSHOT'
+    compile group: 'com.kumuluz.ee.discovery', name: 'kumuluzee-discovery-etcd', version:'1.0.0-SNAPSHOT'
+
+    compile group: 'com.kumuluz.ee.health', name: 'kumuluzee-health', version:'1.0.0-SNAPSHOT'
+
+    compile group: 'com.kumuluz.ee.metrics', name: 'kumuluzee-metrics-core', version:'1.0.0-SNAPSHOT'
+    compile group: 'com.kumuluz.ee.metrics', name: 'kumuluzee-metrics-logs', version:'1.0.0-SNAPSHOT'
+
+    /*compile group: 'com.kumuluz.ee.metrics', name: 'kumuluzee-metrics-prometheus', version:'1.0.0-SNAPSHOT'
+    compile group: 'com.kumuluz.ee.metrics', name: 'kumuluzee-metrics-graphite', version:'1.0.0-SNAPSHOT'
+    compile group: 'com.kumuluz.ee.metrics', name: 'kumuluzee-metrics-logstash', version:'1.0.0-SNAPSHOT'*/
 
     compile group: 'org.postgresql', name: 'postgresql', version: '42.1.1'
 
@@ -107,22 +122,26 @@ docker {
 task dockerfileCreate(type: Dockerfile) {
     group 'docker'
     destFile = project.file('build/kumuluzee/Dockerfile')
-    from 'openjdk:8-jdk'
+    from 'openjdk:8-jre-alpine' //'openjdk:8-jdk'
     maintainer 'Jan Gasperlin "jg1724@student.uni-lj.si"'
-    environmentVariable("PORT", port)
     environmentVariable("JAR", buildKumuluzEE.archiveName)
-    environmentVariable("DB_NAME", 'rsobook-user')
-    environmentVariable("DB_HOST", 'microservice-database')
-    environmentVariable("DB_PORT", '5432')
-    environmentVariable("DB_USERNAME", 'postgres')
-    environmentVariable("DB_PASSWORD", 'root')
+
+    environmentVariable("PORT", port)
+
+    environmentVariable("KUMULUZEE_DATASOURCES0_CONNECTIONURL", 'jdbc:postgresql://ms.database:5432/rsobook-user')
+    environmentVariable("KUMULUZEE_DATASOURCES0_USERNAME", 'postgres')
+    environmentVariable("KUMULUZEE_DATASOURCES0_PASSWORD", 'root')
+
+    environmentVariable("KUMULUZEE_CONFIG_ETCD_HOSTS", 'http://ms.etcd:2379')
+    environmentVariable("KUMULUZEE_DISCOVERY_ETCD_HOSTS", 'http://ms.etcd:2379')
+
     exposePort {
         String.format("%s:%s", port, port)
     }
+
     addFile(buildKumuluzEE.archiveName, "/usr/local/bin/kumuluzee/")
-    addFile("config.yaml", "/usr/local/bin/kumuluzee")
-    addFile("run.sh", "/usr/local/bin/kumuluzee")
-    defaultCommand('/bin/bash','/usr/local/bin/kumuluzee/run.sh', 'start')
+
+    defaultCommand("java", "-jar", "/usr/local/bin/kumuluzee/" + buildKumuluzEE.archiveName)
 }
 
 task dockerfileCopyScript(type: Copy){
