@@ -13,6 +13,8 @@ spec:
         - image: rsobook/ms-user:1.0.0
           name: ms-user
           env:
+            - name: PORT
+              value: 80
             - name: KUMULUZEE_DISCOVERY_ETCD_HOSTS
               value: http://ms-etcd:2379
             - name: KUMULUZEE_CONFIG_ETCD_HOSTS
