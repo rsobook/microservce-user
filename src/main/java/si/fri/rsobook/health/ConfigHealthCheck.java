@@ -18,7 +18,7 @@ public class ConfigHealthCheck implements HealthCheck {
     @Override
     public HealthCheckResponse call() {
 
-        if(userApiConfigProperties.getListsUsers() == null){
+        if(userApiConfigProperties.getListsUsers() == null || userApiConfigProperties.getListsUsers() <= 1){
             return HealthCheckResponse.named(ConfigHealthCheck.class.getSimpleName()).down().build();
         }
 

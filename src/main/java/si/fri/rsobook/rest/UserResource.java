@@ -1,5 +1,6 @@
 package si.fri.rsobook.rest;
 
+import com.kumuluz.ee.logs.cdi.Log;
 import si.fri.rsobook.config.UserApiConfigProperties;
 import si.fri.rsobook.core.database.dto.AuthEntity;
 import si.fri.rsobook.core.database.exceptions.BusinessLogicTransactionException;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @RequestScoped
 @Path("User")
 public class UserResource extends CrudResource<UUID, User> {
+
 
     @Inject
     private UserMetrics userMetrics;
@@ -67,6 +69,7 @@ public class UserResource extends CrudResource<UUID, User> {
         return res;
     }
 
+    @Log
     @Override
     public Response get(String rawId) throws BusinessLogicTransactionException {
         Response res = super.get(rawId);

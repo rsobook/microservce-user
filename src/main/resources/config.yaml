@@ -39,35 +39,43 @@ kumuluzee:
         threshold: 100000000
   metrics:
     generic-registry-name: default
-    #enabled-registries: [default]
     jvm:
       enabled: true
       registry-name: jvm
     servlet:
       enabled: true
       mapping: /metrics
-    #graphite:
-      #address: 192.168.29.181
-      #port: 2003
-      #period-s: 15
-      #pickle: true
-    #logstash:
-      #address: 192.168.29.181
-      #port: 5043
-      #period-s: 15
-    #prometheus:
-      #mapping: /prometheus
     logs:
       enabled: false
       period-s: 30
       level: INFO
     web-instrumentation:
-      #- name: metrics-endpoint
-        #url-pattern: /metrics/*
-        #registry-name: default
-      #- name: prometheus-endpoint
-        #url-pattern: /prometheus/*
       - name: user-endpoint
         url-pattern: /api/v1/User/*
+  logs:
+  # TODO resolve encoding problem
+    config-file: '<?xml version="1.0" encoding="UTF-8"?>
+                  <Configuration name="user">
+                      <Appenders>
+                          <Console name="console" target="SYSTEM_OUT">
+                              <PatternLayout pattern="%d %p %marker %m %X %ex %n"/>
+                          </Console>
+                          <Socket name="logStash" host="478be714-4c75-404b-b5ba-93b9a63053a0-ls.logit.io" port="16043">
+                            <SerializedLayout />
+                          </Socket>
+                      </Appenders>
+                      <Loggers>
+                          <!-- Resources (REST) -->
+                          <Logger name="si.fri.rsobook.rest.UserResource" level="trace" additivity="false">
+                              <AppenderRef ref="console"/>
+                              <AppenderRef ref="logStash"/>
+                          </Logger>
+
+                          <!-- Default logger -->
+                          <Root level="info">
+                              <AppenderRef ref="console"/>
+                          </Root>
+                      </Loggers>
+                  </Configuration>'
 properties:
   lists-users: 5

@@ -1,16 +1,14 @@
 package si.fri.rsobook.metrics;
 
-import com.codahale.metrics.Counter;
+import javax.enterprise.context.RequestScoped;
 
-import javax.enterprise.context.ApplicationScoped;
-
-@ApplicationScoped
+@RequestScoped
 public class UserMetrics {
 
+    //TODO metrics injection
     /*@Inject
-    @Metric(name = "users_returned")*/
-    private Counter usersReturned;
-
+    @Metric(name = "users_returned")
+    private Counter usersReturned;*/
 
     public void addUsersReturned(int count){
         //usersReturned.inc(count);
