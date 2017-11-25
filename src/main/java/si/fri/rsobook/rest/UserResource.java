@@ -1,13 +1,14 @@
 package si.fri.rsobook.rest;
 
 import com.kumuluz.ee.logs.cdi.Log;
+import org.eclipse.microprofile.metrics.Counter;
+import org.eclipse.microprofile.metrics.annotation.Metric;
 import si.fri.rsobook.config.UserApiConfigProperties;
 import si.fri.rsobook.core.database.dto.AuthEntity;
 import si.fri.rsobook.core.database.exceptions.BusinessLogicTransactionException;
 import si.fri.rsobook.core.database.impl.DatabaseImpl;
 import si.fri.rsobook.core.model.User;
 import si.fri.rsobook.core.restComponenets.resource.CrudResource;
-import si.fri.rsobook.metrics.UserMetrics;
 import si.fri.rsobook.service.DatabaseService;
 
 import javax.annotation.PostConstruct;
@@ -22,15 +23,16 @@ import java.util.UUID;
 @Path("User")
 public class UserResource extends CrudResource<UUID, User> {
 
-
-    @Inject
-    private UserMetrics userMetrics;
-
     @Inject
     private UserApiConfigProperties userApiConfigProperties;
 
     @Inject
     private DatabaseService databaseService;
+
+    @Inject
+    @Metric(name = "users_returned")
+    private Counter usersReturnedCounter;
+
 
     public UserResource() {
         super(User.class);
@@ -58,13 +60,13 @@ public class UserResource extends CrudResource<UUID, User> {
         return UUID.fromString(s);
     }
 
-
+    @Log
     @Override
     public Response getList() throws BusinessLogicTransactionException {
         Response res = super.getList();
 
         List<User> userList = (List<User>) res.getEntity();
-        userMetrics.addUsersReturned(userList.size());
+        usersReturnedCounter.inc(userList.size());
 
         return res;
     }
@@ -73,9 +75,7 @@ public class UserResource extends CrudResource<UUID, User> {
     @Override
     public Response get(String rawId) throws BusinessLogicTransactionException {
         Response res = super.get(rawId);
-
-        userMetrics.addUsersReturned(1);
-
+        usersReturnedCounter.inc();
         return res;
     }
 }

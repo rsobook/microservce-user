@@ -60,8 +60,9 @@ kumuluzee:
                           <Console name="console" target="SYSTEM_OUT">
                               <PatternLayout pattern="%d %p %marker %m %X %ex %n"/>
                           </Console>
-                          <Socket name="logStash" host="478be714-4c75-404b-b5ba-93b9a63053a0-ls.logit.io" port="16043">
-                            <SerializedLayout />
+                          <Socket name="logStash" bufferedIO="true" immediateFlush="true" protocol="TCP" host="478be714-4c75-404b-b5ba-93b9a63053a0-ls.logit.io" port="16043">
+                            <JsonLayout properties="true"/>
+                            <!-- <SerializedLayout /> -->
                           </Socket>
                       </Appenders>
                       <Loggers>
