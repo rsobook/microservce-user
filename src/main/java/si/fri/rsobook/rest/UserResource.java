@@ -1,6 +1,8 @@
 package si.fri.rsobook.rest;
 
 import com.kumuluz.ee.logs.cdi.Log;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.microprofile.metrics.Counter;
 import org.eclipse.microprofile.metrics.annotation.Metric;
 import si.fri.rsobook.config.UserApiConfigProperties;
@@ -22,6 +24,9 @@ import java.util.UUID;
 @RequestScoped
 @Path("User")
 public class UserResource extends CrudResource<UUID, User> {
+
+
+    private Logger log = LogManager.getLogger(UserResource.class.getName());
 
     @Inject
     private UserApiConfigProperties userApiConfigProperties;
@@ -67,6 +72,8 @@ public class UserResource extends CrudResource<UUID, User> {
 
         List<User> userList = (List<User>) res.getEntity();
         usersReturnedCounter.inc(userList.size());
+
+        log.debug(String.format("Number of items returned: %d", userList.size()));
 
         return res;
     }
