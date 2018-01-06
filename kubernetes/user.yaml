@@ -13,7 +13,7 @@ spec:
         app: ms-user
     spec:
       containers:
-        - image: rsobook/ms-user:2.0.1
+        - image: rsobook/ms-user:2.0.2
           name: ms-user
           env:
             - name: PORT
